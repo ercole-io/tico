@@ -49,7 +49,7 @@ func (c *Client) GetServiceNowResult(sysClassName string) (*model.ServiceNowResu
 
 	result := &model.ServiceNowResult{}
 
-	if err := json.Unmarshal(body, result); err != nil { // Parse []byte to go struct pointer
+	if err := json.Unmarshal(body, result); err != nil {
 		fmt.Printf("Can not unmarshal JSON, %s", err)
 	}
 

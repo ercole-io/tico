@@ -19,3 +19,5 @@ tico
 .vscode
 __debug_bin
 .idea
+
+config.toml

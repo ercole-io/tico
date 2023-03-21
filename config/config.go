@@ -1,30 +1,21 @@
 package config
 
-import (
-	"encoding/json"
-	"os"
-)
+var Conf Config
 
 type Config struct {
-	Url       string `json:"url"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	ClassName string `json:"class_name"`
+	ServiceNow  ServiceNow
+	OracleCloud OracleCloud
+}
+type ServiceNow struct {
+	URL      string
+	Username string
+	Password string
 }
 
-func Load(filepath string) Config {
-	var config Config
-
-	configFile, err := os.Open(filepath)
-	if err != nil {
-		panic(err)
-	}
-
-	defer configFile.Close()
-
-	if err := json.NewDecoder(configFile).Decode(&config); err != nil {
-		panic(err)
-	}
-
-	return config
+type OracleCloud struct {
+	User        string
+	Fingerprint string
+	Tenancy     string
+	Region      string
+	Key         string
 }
