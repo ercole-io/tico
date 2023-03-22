@@ -20,6 +20,5 @@ func main() {
 		panic(err)
 	}
 
-	fdk.Handle(fdk.HandlerFunc(controller.ServiceNowHandler))
-	fdk.Handle(fdk.HandlerFunc(controller.OracleCloudHandler))
+	fdk.Handle(fdk.HandlerFunc(controller.Handler))
 }
