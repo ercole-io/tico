@@ -2,8 +2,8 @@ github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/fnproject/fdk-go v0.0.26 h1:+/tZJn0uwrPtrNlUUlVzjOvWtHRB1Km0/obKcI+u3pI=
-github.com/fnproject/fdk-go v0.0.26/go.mod h1:I1vcgeMhAypxJ4pxIgq/pERZJvmanYYSlZaScO+oSps=
+github.com/fnproject/fdk-go v0.0.29 h1:5Joxi5Z9RoedcgogWO3D3ZAO82TUfj/MkXmNl16pvgg=
+github.com/fnproject/fdk-go v0.0.29/go.mod h1:I1vcgeMhAypxJ4pxIgq/pERZJvmanYYSlZaScO+oSps=
 github.com/oracle/oci-go-sdk v24.3.0+incompatible h1:x4mcfb4agelf1O4/1/auGlZ1lr97jXRSSN5MxTgG/zU=
 github.com/oracle/oci-go-sdk v24.3.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35ukwStZIg5F66tcBccjip/j888=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
