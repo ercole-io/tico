@@ -2,6 +2,3 @@ schema_version: 20180708
 name: tico
 version: 0.0.1
 runtime: docker
-build_image: fnproject/go:1.17-dev
-run_image: fnproject/go:1.17-dev
-entrypoint: ./func
