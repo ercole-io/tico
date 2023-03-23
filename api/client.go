@@ -28,15 +28,14 @@ func New(url string, user string, password string) *Client {
 	}
 }
 
-func (c *Client) GetServiceNowResult(sysClassName string) (*model.ServiceNowResult, error) {
+func (c *Client) GetServiceNowResult(tablename string) (*model.ServiceNowResult, error) {
 	queryParam := url.Values{}
-	queryParam.Add("sysparm_query", fmt.Sprintf("sys_class_name=%s", sysClassName))
 	queryParam.Add("sysparm_display_value", "true")
 
 	header := http.Header{}
 	header.Add("Authorization", c.basicAuth(c.user, c.password))
 
-	resp, err := c.doRequest(http.MethodGet, "api/now/table/cmdb_ci_business_app", queryParam, header, nil)
+	resp, err := c.doRequest(http.MethodGet, fmt.Sprintf("api/now/table/%s", tablename), queryParam, header, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -12,20 +12,33 @@ Enter the project
 
 `cd tico`
  
-create the configuration:
+create the configuration `config.toml`:
 
 ```
 [ServiceNow]
 URL = "https://<YOUR INSTANCE>.service-now.com"
 Username = ""
 Password = ""
+TableName = ""
+    [ServiceNow.Match]
+    Element=""
+
 
 [OracleCloud]
 User=""
+Fingerprint="
+Tenancy=""
 Region=""
 Key="""-----BEGIN PRIVATE KEY-----
 <YOUR KEY>
 -----END PRIVATE KEY-----"""
+    [OracleCloud.OciTag]
+    NamespaceId=""
+    NamespaceName=""
+    Name=""
+    Description="Tag created by Tico"
+    [OracleCloud.Match]
+    Element=""
 ```
 
 Deploy your application

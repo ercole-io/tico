@@ -20,4 +20,4 @@ tico
 __debug_bin
 .idea
 
-config.toml
+*.toml
