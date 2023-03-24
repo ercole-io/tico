@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/ercole-io/tico/api"
 	"github.com/ercole-io/tico/config"
@@ -14,7 +13,7 @@ import (
 
 func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 	resp, err := service.CreateTag(config.Conf.OracleCloud.OciTag.NamespaceId, config.Conf.OracleCloud.OciTag.Name, config.Conf.OracleCloud.OciTag.Description)
-	if resp.RawResponse.StatusCode == http.StatusConflict {
+	if resp.RawResponse.StatusCode == 409 {
 		fmt.Sprintln(err)
 	}
 
