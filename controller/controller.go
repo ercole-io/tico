@@ -36,10 +36,8 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 						println(resp.RawResponse.StatusCode)
 					}
 				}
-
 			}
 		}
-
 	}
 
 	json.NewEncoder(out).Encode("end")

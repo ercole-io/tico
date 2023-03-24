@@ -1,4 +1,4 @@
-# tico
+# Tico
 The Tico project can sync serviceNow tags with Oracle Cloud
 
 ## Getting started
