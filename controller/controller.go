@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 
@@ -46,7 +47,9 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 		}
 	}
 
-	log.Printf("Oracle Cloud updated tags:%v", updateCounter)
+	outCounter := fmt.Sprintf("Oracle Cloud updated tags:%v", updateCounter)
 
-	json.NewEncoder(out).Encode("end")
+	log.Print(outCounter)
+
+	json.NewEncoder(out).Encode(outCounter)
 }
