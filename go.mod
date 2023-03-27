@@ -8,4 +8,10 @@ require (
 	github.com/oracle/oci-go-sdk/v65 v65.33.0
 )
 
-go 1.15
+require (
+	github.com/gofrs/flock v0.8.1 // indirect
+	github.com/sony/gobreaker v0.5.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+)
+
+go 1.17

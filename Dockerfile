@@ -1,4 +1,4 @@
-FROM fnproject/go:1.15 as build-stage
+FROM fnproject/go:1.17-dev as build-stage
 WORKDIR /function
 WORKDIR /go/src/func/
 ENV GO111MODULE=on
