@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 
 	"github.com/ercole-io/tico/api"
 	"github.com/ercole-io/tico/config"
@@ -14,14 +14,14 @@ import (
 func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 	resp, err := service.CreateTag(config.Conf.OracleCloud.OciTag.NamespaceId, config.Conf.OracleCloud.OciTag.Name, config.Conf.OracleCloud.OciTag.Description)
 	if resp.RawResponse.StatusCode == 409 {
-		fmt.Sprintln(err)
+		log.Println(err)
 	}
 
 	c := api.New(config.Conf.ServiceNow.URL, config.Conf.ServiceNow.Username, config.Conf.ServiceNow.Password)
 
 	snList, err := c.GetServiceNowResult(config.Conf.ServiceNow.TableName)
 	if err != nil {
-		println(err)
+		log.Println(err)
 	}
 
 	ocList := service.SearchResources(config.Conf.OracleCloud.Match.Element)
@@ -32,7 +32,7 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 				for _, sn := range snList.Result {
 					if sn.SerialNumber == v {
 						resp := service.BulkEditTags(oc, sn)
-						println(resp.RawResponse.StatusCode)
+						log.Println(resp.RawResponse.StatusCode)
 					}
 				}
 			}
