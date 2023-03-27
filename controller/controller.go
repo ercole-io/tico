@@ -30,6 +30,7 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 
 	log.Printf("Oracle Cloud Tags items fetched: %v", len(ocList))
 
+	updateCounter := 0
 	for _, oc := range ocList {
 		for _, tag := range oc.DefinedTags {
 			if v, ok := tag[config.Conf.OracleCloud.Match.Element]; ok {
@@ -37,12 +38,15 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 					if sn.SerialNumber == v {
 						log.Printf("ServiceNow item SerialNumber: %s  -  Oracle Cloud resource to updated: %s", sn.SerialNumber, *oc.Identifier)
 						resp := service.BulkEditTags(oc, sn)
-						log.Printf("Edit tag response:%v %s", resp.RawResponse.StatusCode, resp.RawResponse.Status)
+						log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+						updateCounter++
 					}
 				}
 			}
 		}
 	}
+
+	log.Printf("Oracle Cloud updated tags:%v", updateCounter)
 
 	json.NewEncoder(out).Encode("end")
 }

@@ -6,11 +6,15 @@ Create a oracle cloud [Application function](https://docs.oracle.com/en-us/iaas/
 
 In the application clone tico
 
-`git clone https://github.com/ercole-io/tico.git`
+```
+git clone https://github.com/ercole-io/tico.git
+```
 
 Enter the project
 
-`cd tico`
+```
+cd tico
+```
  
 create the configuration `config.toml`:
 
@@ -43,11 +47,15 @@ Key="""-----BEGIN PRIVATE KEY-----
 
 Deploy your application
 
-`fn -v deploy --app <APPLICATION NAME>`
+```
+fn -v deploy --app <APPLICATION NAME>
+```
 
 Invoke
 
-`fn invoke <APPLICATION NAME> tico`
+```
+fn invoke <APPLICATION NAME> tico
+```
 
 or using the specific invoke endpoint
 
