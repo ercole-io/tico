@@ -49,7 +49,7 @@ func (c *Client) GetServiceNowResult(tablename string) (*model.ServiceNowResult,
 	result := &model.ServiceNowResult{}
 
 	if err := json.Unmarshal(body, result); err != nil {
-		log.Println(fmt.Printf("Can not unmarshal JSON, %s", err))
+		log.Printf("Can not unmarshal JSON, %s", err)
 	}
 
 	return result, nil

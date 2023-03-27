@@ -24,15 +24,20 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 		log.Println(err)
 	}
 
+	log.Printf("ServiceNow items fetched: %v", len(snList.Result))
+
 	ocList := service.SearchResources(config.Conf.OracleCloud.Match.Element)
+
+	log.Printf("Oracle Cloud Tags items fetched: %v", len(ocList))
 
 	for _, oc := range ocList {
 		for _, tag := range oc.DefinedTags {
 			if v, ok := tag[config.Conf.OracleCloud.Match.Element]; ok {
 				for _, sn := range snList.Result {
 					if sn.SerialNumber == v {
+						log.Printf("ServiceNow item SerialNumber: %s  -  Oracle Cloud resource to updated: %s", sn.SerialNumber, *oc.Identifier)
 						resp := service.BulkEditTags(oc, sn)
-						log.Println(resp.RawResponse.StatusCode)
+						log.Printf("Edit tag response:%v %s", resp.RawResponse.StatusCode, resp.RawResponse.Status)
 					}
 				}
 			}
@@ -40,5 +45,4 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 	}
 
 	json.NewEncoder(out).Encode("end")
-
 }
