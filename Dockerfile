@@ -4,5 +4,5 @@ WORKDIR /go/src/func/
 ENV GO111MODULE=on
 COPY . .
 COPY config.toml .
-RUN cd /go/src/func/ && go build -o tico/
+RUN cd /go/src/func/ && go build -o tico
 ENTRYPOINT ["./tico"]
