@@ -43,6 +43,12 @@ Key="""-----BEGIN PRIVATE KEY-----
     Description="Tag created by Tico"
     [OracleCloud.Match]
     Element=""
+
+    [OracleCloud.OciObjectStorage]
+    NamespaceName=""
+
+    [OracleCloud.OciDrProtectionGroup]
+    DrProtectionGroupId=""
 ```
 
 Deploy your application

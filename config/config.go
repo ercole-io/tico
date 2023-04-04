@@ -15,13 +15,15 @@ type ServiceNow struct {
 }
 
 type OracleCloud struct {
-	User        string
-	Fingerprint string
-	Tenancy     string
-	Region      string
-	Key         string
-	OciTag      OciTag
-	Match       Match
+	User                 string
+	Fingerprint          string
+	Tenancy              string
+	Region               string
+	Key                  string
+	OciTag               OciTag
+	OciObjectStorage     OciObjectStorage
+	OciDrProtectionGroup OciDrProtectionGroup
+	Match                Match
 }
 
 type OciTag struct {
@@ -29,6 +31,13 @@ type OciTag struct {
 	NamespaceName string
 	Name          string
 	Description   string
+}
+
+type OciObjectStorage struct {
+	NamespaceName string
+}
+type OciDrProtectionGroup struct {
+	DrProtectionGroupId string
 }
 
 type Match struct {

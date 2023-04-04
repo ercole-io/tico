@@ -38,9 +38,48 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 				for _, sn := range snList.Result {
 					if sn.SerialNumber == v {
 						log.Printf("ServiceNow item SerialNumber: %s  -  Oracle Cloud resource to updated: %s", sn.SerialNumber, *oc.Identifier)
-						resp := service.BulkEditTags(oc, sn)
-						log.Printf("Edit tag response: %s", resp.RawResponse.Status)
-						updateCounter++
+						switch *oc.ResourceType {
+						case "Bucket":
+							resp, err := service.UpdateBucket(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+						case "DrProtectionGroup":
+							resp, err := service.UpdateDrProtectionGroup(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+						case "Bastion":
+							resp, err := service.UpdateBastion(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+						case "DrgRouteTable":
+							resp, err := service.UpdateDrgRouteTable(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+						default:
+							resp, err := service.BulkEditTags(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+						}
 					}
 				}
 			}
