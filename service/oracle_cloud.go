@@ -100,11 +100,13 @@ func UpdateBucket(resource resourcesearch.ResourceSummary, snObj model.ServiceNo
 		panic(ok)
 	}
 
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+
 	req := objectstorage.UpdateBucketRequest{
 		BucketName:    resource.DisplayName,
 		NamespaceName: common.String(config.Conf.OracleCloud.OciObjectStorage.NamespaceName),
 		UpdateBucketDetails: objectstorage.UpdateBucketDetails{
-			DefinedTags: map[string]map[string]interface{}{config.Conf.OracleCloud.OciTag.NamespaceName: {config.Conf.OracleCloud.OciTag.Name: businessOwner["display_value"].(string)}},
+			DefinedTags: resource.DefinedTags,
 		}}
 
 	resp, err := client.UpdateBucket(context.Background(), req)
