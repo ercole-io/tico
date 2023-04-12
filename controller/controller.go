@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 
@@ -37,24 +36,33 @@ func Handler(ctx context.Context, in io.Reader, out io.Writer) {
 		ocList <- service.SearchResources(config.Conf.OracleCloud.Match.Element)
 	}()
 
-	log.Println(updateItems(<-snList, <-ocList))
-}
-func printItemsSize(s *model.ServiceNowResult, o []resourcesearch.ResourceSummary) {
-	log.Printf("ServiceNow items fetched: %v", len(s.Result))
-	log.Printf("Oracle Cloud Tags items fetched: %v", len(o))
+	u1 := make(chan int)
+	u2 := make(chan int)
+
+	firstList := <-snList
+	secList := <-ocList
+
+	go func(snHalfL *model.ServiceNowResult, ocL []resourcesearch.ResourceSummary) {
+		u1 <- updateItems(snHalfL.Result[:len(snHalfL.Result)/2], ocL)
+	}(firstList, secList)
+
+	go func(snHalfL *model.ServiceNowResult, ocL []resourcesearch.ResourceSummary) {
+		u2 <- updateItems(snHalfL.Result[len(snHalfL.Result)/2:len(snHalfL.Result)], ocL)
+	}(firstList, secList)
+
+	log.Printf("Oracle Cloud updated tags:%v", <-u1+<-u2)
 }
 
-func updateItems(snList *model.ServiceNowResult, ocList []resourcesearch.ResourceSummary) string {
-	printItemsSize(snList, ocList)
-
+func updateItems(snList []model.ServiceNowObj, ocList []resourcesearch.ResourceSummary) int {
 	updateCounter := 0
 	for _, oc := range ocList {
 	DefinedTag:
 		for _, tag := range oc.DefinedTags {
 			if v, ok := tag[config.Conf.OracleCloud.Match.Element]; ok {
-				for _, sn := range snList.Result {
+				for _, sn := range snList {
 					if sn.SerialNumber == v {
-						log.Printf("ServiceNow item SerialNumber: %s  -  Oracle Cloud resource to updated: %s", sn.SerialNumber, *oc.DisplayName)
+						log.Print(*oc.ResourceType)
+						log.Printf("ServiceNow item Serialnumber: %s  -  Oracle Cloud resource to updated: %s/%s", sn.SerialNumber, *oc.ResourceType, *oc.DisplayName)
 						switch *oc.ResourceType {
 						case "Bucket":
 							resp, err := service.UpdateBucket(oc, sn)
@@ -92,6 +100,60 @@ func updateItems(snList *model.ServiceNowResult, ocList []resourcesearch.Resourc
 								updateCounter++
 							}
 							break DefinedTag
+						case "LoadBalancer":
+							resp, err := service.UpdateLoadBalancer(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+							break DefinedTag
+						case "PublicIpPool":
+							resp, err := service.UpdatePublicIpPool(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+							break DefinedTag
+						case "FileSystem":
+							resp, err := service.UpdateFileSystem(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+							break DefinedTag
+						case "ApiGatewayApi":
+							resp, err := service.UpdateApi(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+							break DefinedTag
+						case "ComputeCapacityReservation":
+							resp, err := service.UpdateComputeCapacityReservation(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+							break DefinedTag
+						case "DedicatedVmHost":
+							resp, err := service.UpdateDedicatedVmHost(oc, sn)
+							if err != nil {
+								log.Print(err)
+							} else {
+								log.Printf("Edit tag response: %s", resp.RawResponse.Status)
+								updateCounter++
+							}
+							break DefinedTag
 						default:
 							resp, err := service.BulkEditTags(oc, sn)
 							if err != nil {
@@ -102,12 +164,11 @@ func updateItems(snList *model.ServiceNowResult, ocList []resourcesearch.Resourc
 							}
 							break DefinedTag
 						}
-
 					}
 				}
 			}
 		}
 	}
 
-	return fmt.Sprintf("Oracle Cloud updated tags:%v", updateCounter)
+	return updateCounter
 }
