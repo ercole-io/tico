@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/ercole-io/tico/config"
-	"github.com/ercole-io/tico/model"
 	"github.com/oracle/oci-go-sdk/filestorage"
 	"github.com/oracle/oci-go-sdk/loadbalancer"
 	"github.com/oracle/oci-go-sdk/resourcesearch"
@@ -16,6 +15,7 @@ import (
 	"github.com/oracle/oci-go-sdk/v65/disasterrecovery"
 	"github.com/oracle/oci-go-sdk/v65/example/helpers"
 	"github.com/oracle/oci-go-sdk/v65/identity"
+	"github.com/oracle/oci-go-sdk/v65/nosql"
 	"github.com/oracle/oci-go-sdk/v65/objectstorage"
 )
 
@@ -42,32 +42,28 @@ func SearchResources(definedTagKey string) []resourcesearch.ResourceSummary {
 	return resp.ResourceSummaryCollection.Items
 }
 
-func BulkEditTags(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*identity.BulkEditTagsResponse, error) {
+func BulkEditTags(resource resourcesearch.ResourceSummary, businessOwner string) (*identity.BulkEditTagsResponse, error) {
 	client, err := identity.NewIdentityClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	req := identity.BulkEditTagsRequest{BulkEditTagsDetails: identity.BulkEditTagsDetails{
-		BulkEditOperations: []identity.BulkEditOperationDetails{
-			{
-				DefinedTags:   map[string]map[string]interface{}{config.Conf.OracleCloud.OciTag.NamespaceName: {config.Conf.OracleCloud.OciTag.Name: businessOwner["display_value"].(string)}},
-				OperationType: identity.BulkEditOperationDetailsOperationTypeAddOrSet,
+	req := identity.BulkEditTagsRequest{
+		BulkEditTagsDetails: identity.BulkEditTagsDetails{
+			BulkEditOperations: []identity.BulkEditOperationDetails{
+				{
+					DefinedTags:   map[string]map[string]interface{}{config.Conf.OracleCloud.OciTag.NamespaceName: {config.Conf.OracleCloud.OciTag.Name: businessOwner}},
+					OperationType: identity.BulkEditOperationDetailsOperationTypeAddOrSet,
+				},
+			},
+			CompartmentId: resource.CompartmentId,
+			Resources: []identity.BulkEditResource{
+				{
+					Id:           resource.Identifier,
+					ResourceType: resource.ResourceType,
+				},
 			},
 		},
-		CompartmentId: resource.CompartmentId,
-		Resources: []identity.BulkEditResource{
-			{
-				Id:           resource.Identifier,
-				ResourceType: resource.ResourceType,
-			},
-		},
-	},
 	}
 
 	resp, err := client.BulkEditTags(context.Background(), req)
@@ -92,18 +88,13 @@ func CreateTag(tagNamespaceId string, name string, description string) (identity
 	return client.CreateTag(context.Background(), req)
 }
 
-func UpdateBucket(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*objectstorage.UpdateBucketResponse, error) {
+func UpdateBucket(resource resourcesearch.ResourceSummary, businessOwner string) (*objectstorage.UpdateBucketResponse, error) {
 	client, err := objectstorage.NewObjectStorageClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := objectstorage.UpdateBucketRequest{
 		BucketName:    resource.DisplayName,
@@ -120,18 +111,13 @@ func UpdateBucket(resource resourcesearch.ResourceSummary, snObj model.ServiceNo
 	return &resp, nil
 }
 
-func UpdateDrProtectionGroup(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*disasterrecovery.UpdateDrProtectionGroupResponse, error) {
+func UpdateDrProtectionGroup(resource resourcesearch.ResourceSummary, businessOwner string) (*disasterrecovery.UpdateDrProtectionGroupResponse, error) {
 	client, err := disasterrecovery.NewDisasterRecoveryClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := disasterrecovery.UpdateDrProtectionGroupRequest{
 		DrProtectionGroupId: common.String(config.Conf.OracleCloud.OciDrProtectionGroup.DrProtectionGroupId),
@@ -147,18 +133,13 @@ func UpdateDrProtectionGroup(resource resourcesearch.ResourceSummary, snObj mode
 	return &resp, nil
 }
 
-func UpdateBastion(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*bastion.UpdateBastionResponse, error) {
+func UpdateBastion(resource resourcesearch.ResourceSummary, businessOwner string) (*bastion.UpdateBastionResponse, error) {
 	client, err := bastion.NewBastionClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := bastion.UpdateBastionRequest{
 		BastionId: resource.Identifier,
@@ -174,18 +155,13 @@ func UpdateBastion(resource resourcesearch.ResourceSummary, snObj model.ServiceN
 	return &resp, nil
 }
 
-func UpdateDrgRouteTable(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*core.UpdateDrgRouteTableResponse, error) {
+func UpdateDrgRouteTable(resource resourcesearch.ResourceSummary, businessOwner string) (*core.UpdateDrgRouteTableResponse, error) {
 	client, err := core.NewVirtualNetworkClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := core.UpdateDrgRouteTableRequest{
 		UpdateDrgRouteTableDetails: core.UpdateDrgRouteTableDetails{
@@ -202,18 +178,13 @@ func UpdateDrgRouteTable(resource resourcesearch.ResourceSummary, snObj model.Se
 	return &resp, nil
 }
 
-func UpdateLoadBalancer(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*loadbalancer.UpdateLoadBalancerResponse, error) {
+func UpdateLoadBalancer(resource resourcesearch.ResourceSummary, businessOwner string) (*loadbalancer.UpdateLoadBalancerResponse, error) {
 	client, err := loadbalancer.NewLoadBalancerClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := loadbalancer.UpdateLoadBalancerRequest{
 		LoadBalancerId: resource.Identifier,
@@ -230,18 +201,13 @@ func UpdateLoadBalancer(resource resourcesearch.ResourceSummary, snObj model.Ser
 	return &resp, nil
 }
 
-func UpdatePublicIpPool(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*core.UpdatePublicIpPoolResponse, error) {
+func UpdatePublicIpPool(resource resourcesearch.ResourceSummary, businessOwner string) (*core.UpdatePublicIpPoolResponse, error) {
 	client, err := core.NewVirtualNetworkClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := core.UpdatePublicIpPoolRequest{
 		PublicIpPoolId: resource.Identifier,
@@ -258,18 +224,13 @@ func UpdatePublicIpPool(resource resourcesearch.ResourceSummary, snObj model.Ser
 	return &resp, nil
 }
 
-func UpdateFileSystem(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*filestorage.UpdateFileSystemResponse, error) {
+func UpdateFileSystem(resource resourcesearch.ResourceSummary, businessOwner string) (*filestorage.UpdateFileSystemResponse, error) {
 	client, err := filestorage.NewFileStorageClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := filestorage.UpdateFileSystemRequest{
 		FileSystemId: resource.Identifier,
@@ -285,18 +246,13 @@ func UpdateFileSystem(resource resourcesearch.ResourceSummary, snObj model.Servi
 	return &resp, nil
 }
 
-func UpdateApi(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*apigateway.UpdateApiResponse, error) {
+func UpdateApi(resource resourcesearch.ResourceSummary, businessOwner string) (*apigateway.UpdateApiResponse, error) {
 	client, err := apigateway.NewApiGatewayClientWithConfigurationProvider(common.DefaultConfigProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := apigateway.UpdateApiRequest{
 		ApiId: resource.Identifier,
@@ -312,18 +268,13 @@ func UpdateApi(resource resourcesearch.ResourceSummary, snObj model.ServiceNowOb
 	return &resp, nil
 }
 
-func UpdateComputeCapacityReservation(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*core.UpdateComputeCapacityReservationResponse, error) {
+func UpdateComputeCapacityReservation(resource resourcesearch.ResourceSummary, businessOwner string) (*core.UpdateComputeCapacityReservationResponse, error) {
 	client, err := core.NewComputeClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := core.UpdateComputeCapacityReservationRequest{
 		CapacityReservationId: resource.Identifier,
@@ -339,18 +290,13 @@ func UpdateComputeCapacityReservation(resource resourcesearch.ResourceSummary, s
 	return &resp, nil
 }
 
-func UpdateDedicatedVmHost(resource resourcesearch.ResourceSummary, snObj model.ServiceNowObj) (*core.UpdateDedicatedVmHostResponse, error) {
+func UpdateDedicatedVmHost(resource resourcesearch.ResourceSummary, businessOwner string) (*core.UpdateDedicatedVmHostResponse, error) {
 	client, err := core.NewComputeClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
 
-	businessOwner, ok := snObj.BusinessOwner.(map[string]interface{})
-	if !ok {
-		panic(ok)
-	}
-
-	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner["display_value"].(string)
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
 
 	req := core.UpdateDedicatedVmHostRequest{
 		DedicatedVmHostId: resource.Identifier,
@@ -358,6 +304,50 @@ func UpdateDedicatedVmHost(resource resourcesearch.ResourceSummary, snObj model.
 			DefinedTags: resource.DefinedTags}}
 
 	resp, err := client.UpdateDedicatedVmHost(context.Background(), req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
+
+func UpdateTable(resource resourcesearch.ResourceSummary, businessOwner string) (*nosql.UpdateTableResponse, error) {
+	client, err := nosql.NewNosqlClientWithConfigurationProvider(getConfigurationProvider())
+	if err != nil {
+		return nil, err
+	}
+
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
+
+	req := nosql.UpdateTableRequest{
+		TableNameOrId: resource.Identifier,
+		UpdateTableDetails: nosql.UpdateTableDetails{
+			DefinedTags: resource.DefinedTags,
+		}}
+
+	resp, err := client.UpdateTable(context.Background(), req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
+
+func UpdateInstance(resource resourcesearch.ResourceSummary, businessOwner string) (*core.UpdateInstanceResponse, error) {
+	client, err := core.NewComputeClientWithConfigurationProvider(getConfigurationProvider())
+	if err != nil {
+		return nil, err
+	}
+
+	resource.DefinedTags[config.Conf.OracleCloud.OciTag.NamespaceName][config.Conf.OracleCloud.OciTag.Name] = businessOwner
+
+	req := core.UpdateInstanceRequest{
+		InstanceId: resource.Identifier,
+		UpdateInstanceDetails: core.UpdateInstanceDetails{
+			DefinedTags: resource.DefinedTags,
+		}}
+
+	resp, err := client.UpdateInstance(context.Background(), req)
 	if err != nil {
 		return nil, err
 	}
