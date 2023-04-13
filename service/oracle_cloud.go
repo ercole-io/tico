@@ -247,7 +247,7 @@ func UpdateFileSystem(resource resourcesearch.ResourceSummary, businessOwner str
 }
 
 func UpdateApi(resource resourcesearch.ResourceSummary, businessOwner string) (*apigateway.UpdateApiResponse, error) {
-	client, err := apigateway.NewApiGatewayClientWithConfigurationProvider(common.DefaultConfigProvider())
+	client, err := apigateway.NewApiGatewayClientWithConfigurationProvider(getConfigurationProvider())
 	if err != nil {
 		return nil, err
 	}
